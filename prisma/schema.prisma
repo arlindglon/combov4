@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model RouletteSession {
+  id        String   @id @default(cuid())
+  name      String   @default("Default Session")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  spins     RouletteSpin[]
+}
+
+model RouletteSpin {
+  id        String   @id @default(cuid())
+  number    Int
+  dozen     Int      // 0 = zero, 1 = 1st(1-12), 2 = 2nd(13-24), 3 = 3rd(25-36)
+  sessionId String
+  session   RouletteSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  prediction PredictionRecord?
+  createdAt DateTime @default(now())
+
+  @@index([sessionId])
+}
+
+model PredictionRecord {
+  id              String   @id @default(cuid())
+  spinId          String   @unique
+  spin            RouletteSpin @relation(fields: [spinId], references: [id], onDelete: Cascade)
+  system1Result   String   // 1st Danger Dozen prediction
+  system2Result   String   // 2nd Danger Dozen prediction
+  system3Result   String   // 3rd Danger Dozen prediction
+  combinedResult  String   // AI combined prediction
+  confidence      Float    @default(0) // 0-1 confidence score
+  patternType     String   @default("") // beem, new, i, j, k, ll, m, n, o, p, q, r, s, wait
+  wasCorrect      Boolean?
+  createdAt       DateTime @default(now())
+}
+
+model PatternMemory {
+  id              String   @id @default(cuid())
+  patternKey      String   // e.g., "1-2-3" (dozen sequence)
+  predictedDozens String   // e.g., "1,2" (predicted dozens)
+  actualDozen     Int      // what actually came
+  wasCorrect      Boolean
+  weight          Float    @default(1.0) // learning weight
+  createdAt       DateTime @default(now())
+
+  @@index([patternKey])
+}
+
+model SystemStats {
+  id            String   @id @default(cuid())
+  systemName    String   @unique // "system1", "system2", "system3", "combined"
+  totalPredictions Int   @default(0)
+  correctPredictions Int @default(0)
+  winRate       Float    @default(0)
+  totalScore    Int      @default(0)
+  streak        Int      @default(0) // positive = winning, negative = losing
+  bestStreak    Int      @default(0)
+  updatedAt     DateTime @updatedAt
+}

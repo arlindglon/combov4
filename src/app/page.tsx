@@ -707,19 +707,23 @@ export default function RoulettePage() {
                               initial={{ opacity: 0, x: -10 }}
                               animate={{ opacity: 1, x: 0 }}
                               className={`border-b ${
-                                entry.isWin 
-                                  ? 'bg-green-50/50' 
-                                  : 'bg-red-50/50'
+                                entry.result === 'wait'
+                                  ? 'bg-gray-50'
+                                  : entry.isWin 
+                                    ? 'bg-green-500' 
+                                    : 'bg-red-500'
                               }`}
                             >
-                              <td className="py-1.5 px-2 text-gray-500 text-xs">{entry.uniqueId}</td>
+                              <td className={`py-1.5 px-2 text-xs ${
+                                entry.result === 'wait' ? 'text-gray-500' : 'text-white font-medium'
+                              }`}>{entry.uniqueId}</td>
                               <td className="py-1.5 px-2">
                                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-bold ${
                                   entry.result === 'wait' 
-                                    ? 'bg-gray-100 text-gray-500'
+                                    ? 'bg-gray-200 text-gray-600'
                                     : entry.isWin 
-                                      ? 'bg-green-100 text-green-700'
-                                      : 'bg-red-100 text-red-700'
+                                      ? 'bg-green-600 text-white'
+                                      : 'bg-red-700 text-white'
                                 }`}
                                 >
                                   {entry.isWin && <CheckCircle2 className="w-3 h-3" />}
@@ -735,16 +739,16 @@ export default function RoulettePage() {
                                   {entry.triggerNumber}
                                 </span>
                               </td>
-                              <td className={`text-center py-1.5 px-2 font-bold text-sm ${
-                                entry.totalNumber > 0 ? 'text-green-600' : entry.totalNumber < 0 ? 'text-red-600' : 'text-gray-500'
-                              }`}>
+                              <td className={`text-center py-1.5 px-2 font-bold text-sm text-white`}>
                                 {entry.totalNumber}
                               </td>
                               <td className="py-1.5 px-2">
-                                <div className={`text-xs px-2 py-1 rounded ${
-                                  entry.isWin 
-                                    ? 'bg-green-100 text-green-700'
-                                    : 'bg-red-100 text-red-700'
+                                <div className={`text-xs px-2 py-1 rounded font-medium ${
+                                  entry.result === 'wait'
+                                    ? 'bg-gray-200 text-gray-600'
+                                    : entry.isWin 
+                                      ? 'bg-green-600 text-white'
+                                      : 'bg-red-700 text-white'
                                 }`}>
                                   {entry.explanation}
                                 </div>
